@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Seu Carrinho{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h1 class="text-center mb-4">Seu Carrinho</h1>
+
+    {% if itens %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Preço Unitário</th>
+                <th>Subtotal</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in itens %}
+            <tr>
+                <td>{{ item.produto.nome }}</td>
+                <td>
+                    <form method="POST" action="{% url 'adicionar_ao_carrinho' item.produto.id %}">
+                        {% csrf_token %}
+                        <input type="number" name="quantidade" class="form-control" value="{{ item.quantidade }}" min="1" max="100">
+                        <button type="submit" class="btn btn-primary btn-sm mt-1">Atualizar</button>
+                    </form>
+                </td>
+                <td>R$ {{ item.preco_unitario }}</td>
+                <td>R$ {{ item.subtotal }}</td>
+                <td>
+                    <form method="POST" action="{% url 'remover_do_carrinho' item.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Remover</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-end">
+        <p><strong>Total: R$ {{ pedido.total }}</strong></p>
+        <form method="POST" action="{% url 'finalizar_compra' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Finalizar Compra</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center">Seu carrinho está vazio.</div>
+    {% endif %}
+</div>
+{% endblock %}
